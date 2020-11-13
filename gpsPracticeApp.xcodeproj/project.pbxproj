@@ -13,6 +13,7 @@
 		21B1DB87255BD30800B05110 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 21B1DB85255BD30800B05110 /* Main.storyboard */; };
 		21B1DB89255BD30900B05110 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 21B1DB88255BD30900B05110 /* Assets.xcassets */; };
 		21B1DB8C255BD30900B05110 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 21B1DB8A255BD30900B05110 /* LaunchScreen.storyboard */; };
+		21B1DB94255E289C00B05110 /* location.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21B1DB93255E289C00B05110 /* location.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -24,6 +25,7 @@
 		21B1DB88255BD30900B05110 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		21B1DB8B255BD30900B05110 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		21B1DB8D255BD30900B05110 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		21B1DB93255E289C00B05110 /* location.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = location.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -60,6 +62,7 @@
 				21B1DB81255BD30800B05110 /* SceneDelegate.swift */,
 				21B1DB83255BD30800B05110 /* ViewController.swift */,
 				21B1DB85255BD30800B05110 /* Main.storyboard */,
+				21B1DB93255E289C00B05110 /* location.swift */,
 				21B1DB88255BD30900B05110 /* Assets.xcassets */,
 				21B1DB8A255BD30900B05110 /* LaunchScreen.storyboard */,
 				21B1DB8D255BD30900B05110 /* Info.plist */,
@@ -140,6 +143,7 @@
 			files = (
 				21B1DB84255BD30800B05110 /* ViewController.swift in Sources */,
 				21B1DB80255BD30800B05110 /* AppDelegate.swift in Sources */,
+				21B1DB94255E289C00B05110 /* location.swift in Sources */,
 				21B1DB82255BD30800B05110 /* SceneDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
