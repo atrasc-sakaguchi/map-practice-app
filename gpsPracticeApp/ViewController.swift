@@ -8,69 +8,57 @@
 
 import UIKit
 import MapKit
+import RealmSwift
+
+class Pin: Object {
+   // 緯度
+   @objc dynamic var latitude = ""
+   // 経度
+   @objc dynamic var longitude = ""
+    
+//    @objc dynamic var textName = ""
+}
 
 class ViewController: UIViewController, MKMapViewDelegate {
 
     var point: MKPointAnnotation = MKPointAnnotation()
-
-    var location:[String] = []
     
+    let annotation = MKPointAnnotation()
     var annotationArray: [MKAnnotation] = []
-        static var hairetu:[User] = []
-    
-    
-    var textName = ""
-    var a = 0.0
-    var b = 0.0
+       var textName = ""
     @IBOutlet weak var map: MKMapView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        
-        guard let a = UserDefaults.standard.array(forKey: "annotation") as? [[Any]] else{
-            //デリゲート先に自分を設定
-            map.delegate = self
-            
-            return
-        }
-        //取り出した情報を変換
-        a.forEach { userText in
-            let user = User(latitude: userText[0], longitude: userText[1], Name: userText[2])
-            //tableViewへ格納
-            ViewController.hairetu.append(user)
-        }
-        print ()
-//        let c = UserDefaults.standard.object(forKey: "location")
-        
-//        point.coordinate = CLLocationCoordinate2DMake c[0]
-        
-//        //中心座標設定(高田馬場事業所のの緯度経度)
-//        let center = CLLocationCoordinate2DMake(35.711501, 139.709180)
-//        //表示範囲設定
-//          let span = MKCoordinateSpan(latitudeDelta:0.005,longitudeDelta: 0.005)
-////        //中心座標と表示範囲をマップに登録
-//          let region = MKCoordinateRegion(center: center,span: span)
-//          map.setRegion(region, animated:true)
-//
-//        //ピンを置く場所
-//        point.coordinate = center
-//        //吹き出しに表示するタイトル
-//        point.title = "ATRASC高田馬場事業所"
-//        self.map.addAnnotation(point)
-  
-        
-    }
+        //中心座標設定(高田馬場事業所のの緯度経度)
+        let center = CLLocationCoordinate2DMake(35.711501, 139.709180)
+        //表示範囲設定
+        let span = MKCoordinateSpan(latitudeDelta:0.005,longitudeDelta: 0.005)
+        //中心座標と表示範囲をマップに登録
+        let region = MKCoordinateRegion(center: center,span: span)
+        map.setRegion(region, animated:true)
 
+        //デリゲート先に自分を設定
+        map.delegate = self
+    }
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
     }
-    
+
+    // マップのロードが終わった時に呼ばれる
+    func mapViewDidFinishLoadingMap(_ mapView: MKMapView) {
+        //Pinを取得してMap上に表示する
+        let annotations = getAnnotations()
+           annotations.forEach { annotation in
+               mapView.addAnnotation(annotation)
+           }
+        }
+
     //アノテーションビューを返す
     func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
         //アノテーションビューを作成する。
         let pinView = MKPinAnnotationView(annotation: annotation, reuseIdentifier: nil)
-
         //吹き出しを表示可能にする。
         pinView.canShowCallout = true
         return pinView
@@ -78,45 +66,36 @@ class ViewController: UIViewController, MKMapViewDelegate {
 
     //マップビュー長押し時の呼び出しメソッド
     @IBAction func pressMap(sender: UILongPressGestureRecognizer) {
-        // ロングタップ開始
-       if sender.state == .began {
-       }
-       // ロングタップ終了（手を離した）
-       else if sender.state == .ended {
-        // タップした位置（CGPoint）を指定
-         let tapPoint = sender.location(in: view)
-         //取得した位置を緯度経度に変換
-         let center = map.convert(tapPoint, toCoordinateFrom: map)
-
-
-        a = center.longitude
-        b = center.latitude
+        //ロングタップ開始
+        if sender.state == .began {
         
-        print(a)
-      
+        }
+        //ロングタップ終了（手を離した）
+        else if sender.state == .ended {
+            //タップした位置（CGPoint）を指定
+            let tapPoint = sender.location(in: view)
+            //取得した位置を緯度経度に変換
+            let center = map.convert(tapPoint, toCoordinateFrom: map)
+            //緯度
+            let lat:String = center.latitude.description
+            //経度
+            let lon:String = center.longitude.description
         
-
-         
-         // ロングタップを検出した位置にピンを立てる
-         point.coordinate = center
-         map.addAnnotation(point)
-        
-        let annotation = MKPointAnnotation()
-               annotation.coordinate = CLLocationCoordinate2DMake(center.latitude,center.longitude)
-               
-       
-        
-        
-        //ポップアップを表示して、登録位置の名前を取得する
-        var alertTextField: UITextField?
-        let popup = UIAlertController(
-            title: "位置登録",
-            message: "登録する名前を入力してください。",
-            preferredStyle: UIAlertController.Style.alert)
-        popup.addTextField(
+            //ロングタップを検出した位置にピンを立てる
+            point.coordinate = center
+            map.addAnnotation(point)
+            annotation.coordinate = CLLocationCoordinate2DMake(center.latitude,center.longitude)
+            //ポップアップを表示して、登録位置の名前を取得する
+            var alertTextField: UITextField?
+            let popup = UIAlertController(
+                title: "位置登録",
+                message: "登録する名前を入力してください。",
+                preferredStyle: UIAlertController.Style.alert)
+            popup.addTextField(
             configurationHandler: {(textField: UITextField!) in
                 alertTextField = textField
-        })
+            })
+            
         //キャンセルボタン
         popup.addAction(
             UIAlertAction(
@@ -129,28 +108,20 @@ class ViewController: UIViewController, MKMapViewDelegate {
                 title: "登録",
                 style: UIAlertAction.Style.default) { _ in
                 if let text = alertTextField?.text {
-                    annotation.title = text
-                    self.location.append(text)
-                 
-                    print(self.a)
-                    self.textName = text
-                    ViewController.hairetu += [User(latitude: self.a,longitude: self.b,Name: self.textName)]
-                    ViewController().savePoint()
+                self.annotation.title = text
+                self.textName = text
                 }
             }
         )
+            
         //位置登録ダイアログを表示
          self.present(popup, animated: true, completion: nil)
-        
-
-        annotation.title = textName
-               annotationArray.append(annotation)
-        
-   
-               location.append(textName)
-
-               self.map.addAnnotations(annotationArray)
-       }
+        annotationArray.append(annotation)
+        self.map.addAnnotations(annotationArray)
+            
+        //保存処理
+        savePin(latitude: lat, longitude: lon)
+        annotation.title = textName       }
    }
 
     //ピンをタップした時に発生
@@ -158,18 +129,44 @@ class ViewController: UIViewController, MKMapViewDelegate {
     }
     
     //登録位置の保存処理
-    func savePoint (){
-        print(a,b,textName)
-//        hairetu += [User(latitude: a,longitude: b,Name: textName)]
-    //配列へ変換
-    var users2:[[Any]] = [];
-        ViewController.hairetu.forEach { hairetu in
-       users2.append(hairetu.toArray());
+    func savePin(latitude: String, longitude: String) {
+        let pin = Pin()
+        pin.latitude = latitude
+        pin.longitude = longitude
+        
+        //Realmインスタンスを生成
+        let realm = try! Realm()
+        try! realm.write {
+            realm.add(pin)
+        }
     }
 
-        UserDefaults.standard.set(users2, forKey: "annotation")
-//        UserDefaults.standard.set(location , forKey: "location")
-        }
-
+    //保存していた座標の取得
+    func getAllPins() -> [Pin] {
+       let realm = try! Realm()
+       var results: [Pin] = []
+       for pin in realm.objects(Pin.self) {
+           results.append(pin)
+       }
+       return results
+    }
+    
+    //座標をAnnotationに変換
+    func getAnnotations() -> [MKPointAnnotation]  {
+       let pins = getAllPins()
+       var results:[MKPointAnnotation] = []
+       
+       pins.forEach { pin in
+           let annotation = MKPointAnnotation()
+           let centerCoordinate = CLLocationCoordinate2D(latitude: (pin.latitude as NSString).doubleValue, longitude:(pin.longitude as NSString).doubleValue)
+           annotation.coordinate = centerCoordinate
+           results.append(annotation)
+       }
+       return results
+    }
+    
+    
+    
+    
 }
 

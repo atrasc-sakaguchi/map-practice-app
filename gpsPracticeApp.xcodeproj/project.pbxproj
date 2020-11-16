@@ -13,7 +13,7 @@
 		21B1DB87255BD30800B05110 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 21B1DB85255BD30800B05110 /* Main.storyboard */; };
 		21B1DB89255BD30900B05110 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 21B1DB88255BD30900B05110 /* Assets.xcassets */; };
 		21B1DB8C255BD30900B05110 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 21B1DB8A255BD30900B05110 /* LaunchScreen.storyboard */; };
-		21B1DB94255E289C00B05110 /* location.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21B1DB93255E289C00B05110 /* location.swift */; };
+		D73997F4933EB618F4CC7D7D /* Pods_gpsPracticeApp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8417983988EBD28BC50B5663 /* Pods_gpsPracticeApp.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -25,7 +25,9 @@
 		21B1DB88255BD30900B05110 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		21B1DB8B255BD30900B05110 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		21B1DB8D255BD30900B05110 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		21B1DB93255E289C00B05110 /* location.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = location.swift; sourceTree = "<group>"; };
+		500F41892175A56A5C82C636 /* Pods-gpsPracticeApp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-gpsPracticeApp.release.xcconfig"; path = "Pods/Target Support Files/Pods-gpsPracticeApp/Pods-gpsPracticeApp.release.xcconfig"; sourceTree = "<group>"; };
+		8417983988EBD28BC50B5663 /* Pods_gpsPracticeApp.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_gpsPracticeApp.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		D4E44E43D323EA2209D542B3 /* Pods-gpsPracticeApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-gpsPracticeApp.debug.xcconfig"; path = "Pods/Target Support Files/Pods-gpsPracticeApp/Pods-gpsPracticeApp.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -33,6 +35,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D73997F4933EB618F4CC7D7D /* Pods_gpsPracticeApp.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -44,6 +47,8 @@
 			children = (
 				21B1DB7E255BD30800B05110 /* gpsPracticeApp */,
 				21B1DB7D255BD30800B05110 /* Products */,
+				D308289BDE2AD3BA744AADEE /* Pods */,
+				7F95FA08AE9BCEE54E2831A1 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -62,12 +67,28 @@
 				21B1DB81255BD30800B05110 /* SceneDelegate.swift */,
 				21B1DB83255BD30800B05110 /* ViewController.swift */,
 				21B1DB85255BD30800B05110 /* Main.storyboard */,
-				21B1DB93255E289C00B05110 /* location.swift */,
 				21B1DB88255BD30900B05110 /* Assets.xcassets */,
 				21B1DB8A255BD30900B05110 /* LaunchScreen.storyboard */,
 				21B1DB8D255BD30900B05110 /* Info.plist */,
 			);
 			path = gpsPracticeApp;
+			sourceTree = "<group>";
+		};
+		7F95FA08AE9BCEE54E2831A1 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				8417983988EBD28BC50B5663 /* Pods_gpsPracticeApp.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		D308289BDE2AD3BA744AADEE /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				D4E44E43D323EA2209D542B3 /* Pods-gpsPracticeApp.debug.xcconfig */,
+				500F41892175A56A5C82C636 /* Pods-gpsPracticeApp.release.xcconfig */,
+			);
+			name = Pods;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -77,9 +98,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 21B1DB90255BD30900B05110 /* Build configuration list for PBXNativeTarget "gpsPracticeApp" */;
 			buildPhases = (
+				121EA437280C5F5CD04CCC7C /* [CP] Check Pods Manifest.lock */,
 				21B1DB78255BD30800B05110 /* Sources */,
 				21B1DB79255BD30800B05110 /* Frameworks */,
 				21B1DB7A255BD30800B05110 /* Resources */,
+				D8F8ACF17520027F2447B9E8 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -136,6 +159,55 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		121EA437280C5F5CD04CCC7C /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-gpsPracticeApp-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		D8F8ACF17520027F2447B9E8 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${SRCROOT}/Pods/Target Support Files/Pods-gpsPracticeApp/Pods-gpsPracticeApp-frameworks.sh",
+				"${BUILT_PRODUCTS_DIR}/Realm/Realm.framework",
+				"${BUILT_PRODUCTS_DIR}/RealmSwift/RealmSwift.framework",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Realm.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RealmSwift.framework",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-gpsPracticeApp/Pods-gpsPracticeApp-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		21B1DB78255BD30800B05110 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -143,7 +215,6 @@
 			files = (
 				21B1DB84255BD30800B05110 /* ViewController.swift in Sources */,
 				21B1DB80255BD30800B05110 /* AppDelegate.swift in Sources */,
-				21B1DB94255E289C00B05110 /* location.swift in Sources */,
 				21B1DB82255BD30800B05110 /* SceneDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -286,6 +357,7 @@
 		};
 		21B1DB91255BD30900B05110 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = D4E44E43D323EA2209D542B3 /* Pods-gpsPracticeApp.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
@@ -303,6 +375,7 @@
 		};
 		21B1DB92255BD30900B05110 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 500F41892175A56A5C82C636 /* Pods-gpsPracticeApp.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
