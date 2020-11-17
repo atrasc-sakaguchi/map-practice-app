@@ -24,6 +24,7 @@ class ViewController: UIViewController, MKMapViewDelegate {
     
     //Realmの取得
     let realm = try! Realm()
+    
     //マップビューの接続
     @IBOutlet weak var map: MKMapView!
     
@@ -91,6 +92,8 @@ class ViewController: UIViewController, MKMapViewDelegate {
         }
     }
     
+    /* ピンの情報の保存、取り出しを行うメソッド*/
+    
     //座標をAnnotationに変換
     func getAnnotations() -> [MKPointAnnotation]  {
         //保存していたピンの座標を取得
@@ -113,9 +116,8 @@ class ViewController: UIViewController, MKMapViewDelegate {
     
     //保存していた座標を取り出す
     func getAllPins() -> [Pin] {
-        let realm = try! Realm()
-        var results: [Pin] = []
         //保存していたピンを配列に詰めて返す
+        var results: [Pin] = []
         for pin in realm.objects(Pin.self) {
             results.append(pin)
         }
