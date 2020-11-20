@@ -117,6 +117,7 @@ class ViewController: UIViewController, MKMapViewDelegate, UITableViewDelegate, 
             do{
                 //mapの今の状態を取得
                 mapViewDidFinishLoadingMap(map)
+                //マップ上のピンを削除
                 map.removeAnnotation(pins[indexPath.row])
                 //tableviewリロード
                 tableView.reloadData()
@@ -128,13 +129,9 @@ class ViewController: UIViewController, MKMapViewDelegate, UITableViewDelegate, 
                 self.pins.remove(at: indexPath.row)
                 //tableviewからも削除
                 tableView.deleteRows(at: [indexPath], with: UITableView.RowAnimation.fade)
-            
-                //mapの今の状態を取得
-                mapViewDidFinishLoadingMap(map)
-
-            }
+                }
             catch{
-            }
+                }
         }
     }
     
