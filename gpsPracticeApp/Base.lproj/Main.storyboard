@@ -15,8 +15,38 @@
                         <rect key="frame" x="0.0" y="0.0" width="768" height="1024"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="MbR-B2-XlZ">
+                                <rect key="frame" x="0.0" y="0.0" width="240" height="1024"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="240" id="n6v-kz-njp"/>
+                                </constraints>
+                                <prototypes>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="cell" textLabel="Xah-uP-Q2W" style="IBUITableViewCellStyleDefault" id="dTv-JE-h6D">
+                                        <rect key="frame" x="0.0" y="28" width="240" height="43.5"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="dTv-JE-h6D" id="U8j-yV-6Tl">
+                                            <rect key="frame" x="0.0" y="0.0" width="240" height="43.5"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="Xah-uP-Q2W">
+                                                    <rect key="frame" x="15" y="0.0" width="210" height="43.5"/>
+                                                    <autoresizingMask key="autoresizingMask"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                </prototypes>
+                                <connections>
+                                    <outlet property="dataSource" destination="BYZ-38-t0r" id="BPW-Kf-cmh"/>
+                                    <outlet property="delegate" destination="BYZ-38-t0r" id="e4e-Me-bQj"/>
+                                </connections>
+                            </tableView>
                             <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" mapType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="k0b-bc-XGk">
-                                <rect key="frame" x="0.0" y="0.0" width="768" height="1024"/>
+                                <rect key="frame" x="240" y="0.0" width="528" height="1024"/>
                                 <gestureRecognizers/>
                                 <connections>
                                     <outlet property="delegate" destination="8bC-Xf-vdC" id="jHh-2r-BzX"/>
@@ -27,17 +57,19 @@
                         <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                         <gestureRecognizers/>
                         <constraints>
-                            <constraint firstItem="k0b-bc-XGk" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="Pws-XQ-oGw"/>
-                            <constraint firstItem="k0b-bc-XGk" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="UYs-nm-EXQ"/>
-                            <constraint firstItem="k0b-bc-XGk" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" id="Y65-OW-DRp"/>
-                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="k0b-bc-XGk" secondAttribute="bottom" id="fSA-mC-dod"/>
-                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="k0b-bc-XGk" secondAttribute="trailing" id="mrz-8c-UeB"/>
-                            <constraint firstItem="k0b-bc-XGk" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" id="zbv-eL-gvm"/>
+                            <constraint firstAttribute="bottom" secondItem="MbR-B2-XlZ" secondAttribute="bottom" id="2Y7-G0-LRc"/>
+                            <constraint firstItem="k0b-bc-XGk" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" id="EAU-Y4-qnw"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="k0b-bc-XGk" secondAttribute="bottom" id="Ogw-5z-coY"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="k0b-bc-XGk" secondAttribute="trailing" id="RbF-sd-4K2"/>
+                            <constraint firstItem="MbR-B2-XlZ" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="Zvo-Ii-YTz"/>
+                            <constraint firstItem="k0b-bc-XGk" firstAttribute="leading" secondItem="MbR-B2-XlZ" secondAttribute="trailing" id="fzE-vH-3Su"/>
+                            <constraint firstItem="MbR-B2-XlZ" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" id="sDt-qf-1Jz"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                     </view>
                     <connections>
                         <outlet property="map" destination="k0b-bc-XGk" id="rgm-1k-vSV"/>
+                        <outlet property="tableView" destination="MbR-B2-XlZ" id="Yqa-V4-ece"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
@@ -47,7 +79,7 @@
                     </connections>
                 </pongPressGestureRecognizer>
             </objects>
-            <point key="canvasLocation" x="-339" y="11"/>
+            <point key="canvasLocation" x="-339.2578125" y="10.15625"/>
         </scene>
     </scenes>
 </document>

@@ -20,18 +20,24 @@ class Pin: Object {
     @objc dynamic var textName = ""
 }
 
-class ViewController: UIViewController, MKMapViewDelegate {
-    
+class ViewController: UIViewController, MKMapViewDelegate, UITableViewDelegate, UITableViewDataSource
+{
     //Realmの取得
-    let realm = try! Realm()
+    static let realm = try! Realm()
+    //ピンのannotation情報を保持
+    var pins:[MKPointAnnotation] = []
+    //realmに保存している配列の情報ぞ保持
+    var results: [Pin] = []
     
     //マップビューの接続
     @IBOutlet weak var map: MKMapView!
+    //テーブルビューの接続
+    @IBOutlet weak var tableView: UITableView!
     
     //マップビュー長押し時の呼び出しメソッド
     @IBAction func pressMap(sender: UILongPressGestureRecognizer!) {
         //タップした位置（CGPoint）を指定
-        let tapPoint = sender.location(in: view)
+        let tapPoint = sender.location(in: map)
         //取得した位置を緯度,経度に変換
         let center = self.map.convert(tapPoint, toCoordinateFrom: map)
         //緯度
@@ -58,6 +64,10 @@ class ViewController: UIViewController, MKMapViewDelegate {
                     self.addAnnotation(latitude: center.latitude, longitude: center.longitude, title: text)
                     //登録したピンの情報を保存
                     ViewController().savePin(latitude: lat, longitude: lon, location: text)
+                    //登録後のreslutsを更新
+                    self.results = self.getAllPins()
+                    //tableviewをリロード
+                    self.tableView.reloadData()
                 }
             })
         //作成した地点入力ダイアログを表示
@@ -65,11 +75,69 @@ class ViewController: UIViewController, MKMapViewDelegate {
         }
     }
     
-    override func viewDidLoad() {
-         super.viewDidLoad()
-         //デリゲート先に自分を設定
-         map.delegate = self
-     }
+    
+    /*TableViewの作成*/
+    
+    //Realmに保存されているオブジェクトを取得
+    let realmObjects = ViewController.realm.objects(Pin.self)
+       
+    //表示する件数を返す
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return realmObjects.count
+    }
+       
+    //セルの表示内容を返す
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
+        //表示する内容を取得し、セルに設定
+        let title = realmObjects[indexPath.row]
+        cell.textLabel?.text = title.textName
+        return cell
+    }
+
+    //セルが選択された時の処理
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        //選択されたセルから地点の緯度と経度を取得して設定
+        let annotation = self.pins[indexPath.row]
+        //表示範囲設定
+        let span = MKCoordinateSpan(latitudeDelta:2.0,longitudeDelta: 2.0)
+        //緯度経度と表示範囲
+        let region = MKCoordinateRegion(center: annotation.coordinate,span: span)
+        //緯度経度と表示範囲をマップに設定
+        map.setRegion(region, animated:true)
+        //吹き出しを表示する
+        map.selectedAnnotations = [annotation]
+    }
+    
+    //編集処理
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        //削除
+        if editingStyle == .delete{
+            // Realm内のデータを削除
+            do{
+                //mapの今の状態を取得
+                mapViewDidFinishLoadingMap(map)
+                map.removeAnnotation(pins[indexPath.row])
+                //tableviewリロード
+                tableView.reloadData()
+                //realmから対象行を削除
+                try ViewController.realm.write {
+                    ViewController.realm.delete(self.results[indexPath.row])
+                }
+                //annotationの配列からも削除
+                self.pins.remove(at: indexPath.row)
+                //tableviewからも削除
+                tableView.deleteRows(at: [indexPath], with: UITableView.RowAnimation.fade)
+            
+                //mapの今の状態を取得
+                mapViewDidFinishLoadingMap(map)
+
+            }
+            catch{
+            }
+        }
+    }
+    
     
     /* mapViewに関するメソッド*/
      
@@ -85,12 +153,15 @@ class ViewController: UIViewController, MKMapViewDelegate {
     
     //取得できたピンをマップに追加（マップのロード終了時に呼び出される）
     func mapViewDidFinishLoadingMap(_ mapView: MKMapView) {
+        //初期化
+        pins.removeAll()
         //Pinを取得してMap上に表示する
-        let annotations = getAnnotations()
-        annotations.forEach { annotation in
-            mapView.addAnnotation(annotation)
+        self.pins = getAnnotations()
+        self.pins.forEach { pin in
+        map.addAnnotation(pin)
         }
     }
+    
     
     /* ピンの情報の保存、取り出しを行うメソッド*/
     
@@ -99,7 +170,6 @@ class ViewController: UIViewController, MKMapViewDelegate {
         //保存していたピンの座標を取得
         let pins = getAllPins()
         
-        var results:[MKPointAnnotation] = []
         //緯度・経度をCLLocationCoordinate2Dに変換してアノテーションに設定
         pins.forEach { pin in
             let annotation = MKPointAnnotation()
@@ -108,17 +178,18 @@ class ViewController: UIViewController, MKMapViewDelegate {
             annotation.coordinate = centerCoordinate
             //地点名を取得
             annotation.title = pin.textName
-            //取得した情報を追加
-            results.append(annotation)
-       }
-       return results
+            //取得した情報をannotationに追加
+            self.pins.append(annotation)
+        }
+        return self.pins
     }
     
     //保存していた座標を取り出す
     func getAllPins() -> [Pin] {
+        //初期化
+        results.removeAll()
         //保存していたピンを配列に詰めて返す
-        var results: [Pin] = []
-        for pin in realm.objects(Pin.self) {
+        for pin in ViewController.realm.objects(Pin.self) {
             results.append(pin)
         }
         return results
@@ -134,6 +205,8 @@ class ViewController: UIViewController, MKMapViewDelegate {
         annotation.title = title
         //mapに追加
         map.addAnnotation(annotation)
+        //pinsに追加
+        self.pins.append(annotation)
     }
     
     //登録位置の保存処理
@@ -147,9 +220,15 @@ class ViewController: UIViewController, MKMapViewDelegate {
         pin.textName = location
         
         //Realmへのデータ追加
-        try! realm.write {
-            realm.add(pin)
+        try! ViewController.realm.write {
+            ViewController.realm.add(pin)
         }
+    }
+    
+    override func viewDidLoad() {
+          super.viewDidLoad()
+        //デリゲート先に自分を設定
+        map.delegate = self
     }
 }
 
