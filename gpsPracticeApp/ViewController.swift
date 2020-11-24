@@ -26,12 +26,11 @@ class ViewController: UIViewController, MKMapViewDelegate, UITableViewDelegate, 
     static let realm = try! Realm()
     //ピンのannotation情報を保持
     var pins:[MKPointAnnotation] = []
-    //realmに保存している配列の情報ぞ保持
+    //realmに保存している配列の情報保持
     var results: [Pin] = []
     
-    //マップビューの接続
+
     @IBOutlet weak var map: MKMapView!
-    //テーブルビューの接続
     @IBOutlet weak var tableView: UITableView!
     
     //マップビュー長押し時の呼び出しメソッド
@@ -58,80 +57,20 @@ class ViewController: UIViewController, MKMapViewDelegate, UITableViewDelegate, 
             popup.addAction( UIAlertAction( title: "キャンセル", style: UIAlertAction.Style.cancel,handler: nil ))
             //登録ボタン
             popup.addAction( UIAlertAction(title: "登録",style: UIAlertAction.Style.default ) { _ in
-                //テキストがnilじゃなかった場合（nilの場合地点名の登録なし）
-                if let text = alertTextField?.text {
-                    //ピンを立てる
-                    self.addAnnotation(latitude: center.latitude, longitude: center.longitude, title: text)
-                    //登録したピンの情報を保存
-                    ViewController().savePin(latitude: lat, longitude: lon, location: text)
-                    //登録後のreslutsを更新
-                    self.results = self.getAllPins()
-                    //tableviewをリロード
-                    self.tableView.reloadData()
-                }
-            })
+            //テキストがnilじゃなかった場合（nilの場合地点名の登録なし）
+            if let text = alertTextField?.text {
+                //ピンを立てる
+                self.addAnnotation(latitude: center.latitude, longitude: center.longitude, title: text)
+                //登録したピンの情報を保存
+                ViewController().savePin(latitude: lat, longitude: lon, location: text)
+                //登録後のreslutsを更新
+                self.results = self.getAllPins()
+                //tableviewをリロード
+                self.tableView.reloadData()
+            }
+        })
         //作成した地点入力ダイアログを表示
         self.present(popup, animated: true, completion: nil)
-        }
-    }
-    
-    
-    /*TableViewの作成*/
-    
-    //Realmに保存されているオブジェクトを取得
-    let realmObjects = ViewController.realm.objects(Pin.self)
-       
-    //表示する件数を返す
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return realmObjects.count
-    }
-       
-    //セルの表示内容を返す
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
-        //表示する内容を取得し、セルに設定
-        let title = realmObjects[indexPath.row]
-        cell.textLabel?.text = title.textName
-        return cell
-    }
-
-    //セルが選択された時の処理
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        //選択されたセルから地点の緯度と経度を取得して設定
-        let annotation = self.pins[indexPath.row]
-        //表示範囲設定
-        let span = MKCoordinateSpan(latitudeDelta:2.0,longitudeDelta: 2.0)
-        //緯度経度と表示範囲
-        let region = MKCoordinateRegion(center: annotation.coordinate,span: span)
-        //緯度経度と表示範囲をマップに設定
-        map.setRegion(region, animated:true)
-        //吹き出しを表示する
-        map.selectedAnnotations = [annotation]
-    }
-    
-    //編集処理
-    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-        //削除
-        if editingStyle == .delete{
-            // Realm内のデータを削除
-            do{
-                //mapの今の状態を取得
-                mapViewDidFinishLoadingMap(map)
-                //マップ上のピンを削除
-                map.removeAnnotation(pins[indexPath.row])
-                //tableviewリロード
-                tableView.reloadData()
-                //realmから対象行を削除
-                try ViewController.realm.write {
-                    ViewController.realm.delete(self.results[indexPath.row])
-                }
-                //annotationの配列からも削除
-                self.pins.remove(at: indexPath.row)
-                //tableviewからも削除
-                tableView.deleteRows(at: [indexPath], with: UITableView.RowAnimation.fade)
-                }
-            catch{
-                }
         }
     }
     
@@ -145,24 +84,44 @@ class ViewController: UIViewController, MKMapViewDelegate, UITableViewDelegate, 
         //吹き出しを表示可能にする。
         pinView.canShowCallout = true
         
+        //右ボタンをアノテーションビューに追加する。
+        let button = UIButton()
+        button.frame = CGRect(x: 0,y: 0,width: 40,height: 40)
+        button.setTitle("削除", for: .normal)
+        button.backgroundColor = UIColor.red
+        button.setTitleColor(UIColor.white, for: .normal)
+        pinView.rightCalloutAccessoryView = button
+        
         return pinView
+    }
+    
+    //吹き出しアクササリー押下時の呼び出しメソッド（）吹き出しの削除ボタン
+    func mapView(_ mapView: MKMapView, annotationView view: MKAnnotationView, calloutAccessoryControlTapped control: UIControl) {
+        
+        if(control == view.rightCalloutAccessoryView) {
+            //右のボタンが押された場合はピンを消す。
+            map.removeAnnotation(view.annotation!)
+            
+            //選択されたピンがデータ上で何行目のものか取得したい・・・！→tableView、realm上からも削除したい
+        }
     }
     
     //取得できたピンをマップに追加（マップのロード終了時に呼び出される）
     func mapViewDidFinishLoadingMap(_ mapView: MKMapView) {
         //初期化
         pins.removeAll()
-        //Pinを取得してMap上に表示する
+        //Pinを取得
         self.pins = getAnnotations()
+        //map上に追加
         self.pins.forEach { pin in
-        map.addAnnotation(pin)
+            map.addAnnotation(pin)
         }
     }
     
     
     /* ピンの情報の保存、取り出しを行うメソッド*/
     
-    //座標をAnnotationに変換
+    //座標をAnnotationに変換するメソッド
     func getAnnotations() -> [MKPointAnnotation]  {
         //保存していたピンの座標を取得
         let pins = getAllPins()
@@ -181,7 +140,7 @@ class ViewController: UIViewController, MKMapViewDelegate, UITableViewDelegate, 
         return self.pins
     }
     
-    //保存していた座標を取り出す
+    //保存していた座標を取り出すメソッド
     func getAllPins() -> [Pin] {
         //初期化
         results.removeAll()
@@ -206,7 +165,7 @@ class ViewController: UIViewController, MKMapViewDelegate, UITableViewDelegate, 
         self.pins.append(annotation)
     }
     
-    //登録位置の保存処理
+    //登録位置の保存メソッド
     func savePin(latitude: String, longitude: String ,location: String) {
         let pin = Pin()
         //緯度
@@ -222,6 +181,100 @@ class ViewController: UIViewController, MKMapViewDelegate, UITableViewDelegate, 
         }
     }
     
+    
+    /*TableViewの作成*/
+       
+       //Realmに保存されているオブジェクトを取得
+       let realmObjects = ViewController.realm.objects(Pin.self)
+          
+       //表示する件数を返す
+       func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+           return realmObjects.count + 1
+       }
+          
+       //セルの表示内容を返す
+       func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+           //tableviewのセル設定
+           switch indexPath.row{
+               //戻るセル
+               case realmObjects.count:
+                   let secondCell = tableView.dequeueReusableCell(withIdentifier: "SecondCell", for: indexPath)
+                   //セルの内容を指定
+                   secondCell.textLabel?.text = "日本全体表示"
+               return secondCell
+               
+               //地点表示用のセル設定
+               default:
+                   let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
+                   //表示する内容を取得し、セルに設定
+                   let title = realmObjects[indexPath.row]
+                   cell.textLabel?.text = title.textName
+                return cell
+            }
+       }
+
+       //セルが選択された時の処理
+       func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+           //戻るセル
+           if indexPath.row == realmObjects.count{
+               //選択されたセルから地点の緯度と経度を取得して設定
+               let center = CLLocationCoordinate2D(latitude: 38.258595, longitude: 137.6850225)
+               //表示範囲設定
+               let span = MKCoordinateSpan(latitudeDelta:19.0,longitudeDelta: 19.0)
+               //緯度経度と表示範囲
+               let region = MKCoordinateRegion(center: center,span: span)
+               //緯度経度と表示範囲をマップに設定
+               map.setRegion(region, animated:true)
+           }
+           //地点セル
+           else{
+               //選択されたセルから地点の緯度と経度を取得して設定
+               let annotation = self.pins[indexPath.row]
+               //表示範囲設定
+               let span = MKCoordinateSpan(latitudeDelta:2.0,longitudeDelta: 2.0)
+               //緯度経度と表示範囲
+               let region = MKCoordinateRegion(center: annotation.coordinate,span: span)
+               //緯度経度と表示範囲をマップに設定
+               map.setRegion(region, animated:true)
+               //吹き出しを表示する
+               map.selectedAnnotations = [annotation]
+           }
+       }
+       
+       //編集処理
+       func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+           //削除
+           if editingStyle == .delete{
+               // Realm内のデータを削除
+               do{
+                   //tableviewリロード
+                   tableView.reloadData()
+                   //realmから対象行を削除
+                   try ViewController.realm.write {
+                       ViewController.realm.delete(self.results[indexPath.row])
+                   }
+                   //realmに保存している配列の情報（results）から対象行を削除
+                   self.results.remove(at: indexPath.row)
+                   //マップ上のピンを削除
+                   map.removeAnnotation(pins[indexPath.row])
+                   //annotationの配列(pins)からも削除
+                   self.pins.remove(at: indexPath.row)
+                   //tableviewからも削除
+                   tableView.deleteRows(at: [indexPath], with: UITableView.RowAnimation.fade)
+                   }
+               catch{
+                   }
+            }
+       }
+       
+       //セルの編集制御
+       func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+           //新規登録セル(最終行のセル)だった場合、削除不可
+           if indexPath.row == realmObjects.count { return false }
+           //それ以外は削除可能
+           else { return true }
+       }
+       
     override func viewDidLoad() {
           super.viewDidLoad()
         //デリゲート先に自分を設定
