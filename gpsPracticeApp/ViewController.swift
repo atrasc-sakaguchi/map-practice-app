@@ -25,9 +25,9 @@ class ViewController: UIViewController, MKMapViewDelegate, UITableViewDelegate, 
     //Realmの取得
     static let realm = try! Realm()
     //ピンのannotation情報を保持
-    var pins:[MKPointAnnotation] = []
+    var annotations:[MKPointAnnotation] = []
     //realmに保存している配列の情報保持
-    var results: [Pin] = []
+    var pins: [Pin] = []
     
 
     @IBOutlet weak var map: MKMapView!
@@ -64,7 +64,7 @@ class ViewController: UIViewController, MKMapViewDelegate, UITableViewDelegate, 
                 //登録したピンの情報を保存
                 ViewController().savePin(latitude: lat, longitude: lon, location: text)
                 //登録後のreslutsを更新
-                self.results = self.getAllPins()
+                self.pins = self.getAllPins()
                 //tableviewをリロード
                 self.tableView.reloadData()
             }
@@ -97,23 +97,31 @@ class ViewController: UIViewController, MKMapViewDelegate, UITableViewDelegate, 
     
     //吹き出しアクササリー押下時の呼び出しメソッド（）吹き出しの削除ボタン
     func mapView(_ mapView: MKMapView, annotationView view: MKAnnotationView, calloutAccessoryControlTapped control: UIControl) {
-        
         if(control == view.rightCalloutAccessoryView) {
-            //右のボタンが押された場合はピンを消す。
-            map.removeAnnotation(view.annotation!)
-            
-            //選択されたピンがデータ上で何行目のものか取得したい・・・！→tableView、realm上からも削除したい
+            //選択されたピンがデータ上で何行目のものか取得し、データを削除する
+			if let annotation = view.annotation as? MKPointAnnotation,
+			   let index = self.annotations.firstIndex(of: annotation) {	//何番目のピンか
+				//realmから対象行を削除
+				try! ViewController.realm.write {
+					ViewController.realm.delete(self.pins[index])
+				}
+				
+				//表リロード
+				self.tableView.reloadData();
+				//最後にピンを消す。
+				map.removeAnnotation(view.annotation!);
+			}
         }
     }
     
     //取得できたピンをマップに追加（マップのロード終了時に呼び出される）
     func mapViewDidFinishLoadingMap(_ mapView: MKMapView) {
         //初期化
-        pins.removeAll()
+        annotations.removeAll()
         //Pinを取得
-        self.pins = getAnnotations()
+        self.annotations = getAnnotations()
         //map上に追加
-        self.pins.forEach { pin in
+        self.annotations.forEach { pin in
             map.addAnnotation(pin)
         }
     }
@@ -135,20 +143,20 @@ class ViewController: UIViewController, MKMapViewDelegate, UITableViewDelegate, 
             //地点名を取得
             annotation.title = pin.textName
             //取得した情報をannotationに追加
-            self.pins.append(annotation)
+            self.annotations.append(annotation)
         }
-        return self.pins
+        return self.annotations
     }
     
     //保存していた座標を取り出すメソッド
     func getAllPins() -> [Pin] {
         //初期化
-        results.removeAll()
+        pins.removeAll()
         //保存していたピンを配列に詰めて返す
         for pin in ViewController.realm.objects(Pin.self) {
-            results.append(pin)
+            pins.append(pin)
         }
-        return results
+        return pins
     }
     
     //ピンの生成、マップへの追加メソッド
@@ -162,7 +170,7 @@ class ViewController: UIViewController, MKMapViewDelegate, UITableViewDelegate, 
         //mapに追加
         map.addAnnotation(annotation)
         //pinsに追加
-        self.pins.append(annotation)
+        self.annotations.append(annotation)
     }
     
     //登録位置の保存メソッド
@@ -185,7 +193,7 @@ class ViewController: UIViewController, MKMapViewDelegate, UITableViewDelegate, 
     /*TableViewの作成*/
        
        //Realmに保存されているオブジェクトを取得
-       let realmObjects = ViewController.realm.objects(Pin.self)
+       var realmObjects = ViewController.realm.objects(Pin.self)
           
        //表示する件数を返す
        func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -229,7 +237,7 @@ class ViewController: UIViewController, MKMapViewDelegate, UITableViewDelegate, 
            //地点セル
            else{
                //選択されたセルから地点の緯度と経度を取得して設定
-               let annotation = self.pins[indexPath.row]
+               let annotation = self.annotations[indexPath.row]
                //表示範囲設定
                let span = MKCoordinateSpan(latitudeDelta:2.0,longitudeDelta: 2.0)
                //緯度経度と表示範囲
@@ -244,26 +252,26 @@ class ViewController: UIViewController, MKMapViewDelegate, UITableViewDelegate, 
        //編集処理
        func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
            //削除
-           if editingStyle == .delete{
-               // Realm内のデータを削除
-               do{
-                   //tableviewリロード
-                   tableView.reloadData()
-                   //realmから対象行を削除
-                   try ViewController.realm.write {
-                       ViewController.realm.delete(self.results[indexPath.row])
-                   }
-                   //realmに保存している配列の情報（results）から対象行を削除
-                   self.results.remove(at: indexPath.row)
-                   //マップ上のピンを削除
-                   map.removeAnnotation(pins[indexPath.row])
-                   //annotationの配列(pins)からも削除
-                   self.pins.remove(at: indexPath.row)
-                   //tableviewからも削除
-                   tableView.deleteRows(at: [indexPath], with: UITableView.RowAnimation.fade)
-                   }
-               catch{
-                   }
+			if editingStyle == .delete{
+				
+				let pin = self.pins[indexPath.row];
+				let annotation = self.annotations[indexPath.row];
+				
+				//realmに保存している配列の情報（results）から対象行を削除
+				self.pins.remove(at: indexPath.row)
+				
+				//マップ上のピンを削除
+				map.removeAnnotation(annotation)
+				//annotationの配列(annotations)からも削除
+				self.annotations.remove(at: indexPath.row)
+				
+				//realmから対象行を削除
+				try! ViewController.realm.write {
+					ViewController.realm.delete(pin)
+				}
+				realmObjects = ViewController.realm.objects(Pin.self)
+				//tableviewから削除(見た目)
+				tableView.deleteRows(at: [indexPath], with: UITableView.RowAnimation.fade)
             }
        }
        
